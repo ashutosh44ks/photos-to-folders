@@ -1,14 +1,11 @@
 import React from 'react';
 import './FolderList.css';
 
-export default function FolderList({ folders, selectedFolders, onToggleFolder, onCreateFolder }) {
+export default function FolderList({ folders, selectedFolders, onToggleFolder }) {
   return (
     <div className="folder-list-container">
       <div className="folder-list-header">
-        <h3>Destination Folders</h3>
-        <button className="btn-create-folder" onClick={onCreateFolder}>
-          + New Folder
-        </button>
+        <h3>Folders</h3>
       </div>
 
       {folders.length === 0 ? (
@@ -29,12 +26,6 @@ export default function FolderList({ folders, selectedFolders, onToggleFolder, o
           ))}
         </div>
       )}
-
-      <div className="folder-selection-info">
-        <p>
-          {selectedFolders.length} folder{selectedFolders.length !== 1 ? 's' : ''} selected
-        </p>
-      </div>
     </div>
   );
 }

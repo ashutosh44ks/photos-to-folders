@@ -138,11 +138,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>📁 Photos to Folders</h1>
-        <p className="subtitle">Organize and move your images</p>
-      </header>
-
       <div className="app-container">
         <div className="main-content">
           <ImageViewer
@@ -174,23 +169,20 @@ export default function App() {
             folders={folders}
             selectedFolders={selectedFolders}
             onToggleFolder={handleToggleFolder}
-            onCreateFolder={() => setShowModal(true)}
           />
+          <div className="sidebar-actions">
+            <button className="btn-create-folder" onClick={() => setShowModal(true)}>
+              + New Folder
+            </button>
+            <button
+              onClick={handleSaveAndNext}
+              disabled={selectedFolders.length === 0 || images.length === 0 || saving}
+              className="btn btn-primary btn-save"
+              >
+              {saving ? 'Saving...' : '✓ Save & Next'}
+            </button>
+          </div>
 
-          <button
-            onClick={handleSaveAndNext}
-            disabled={selectedFolders.length === 0 || images.length === 0 || saving}
-            className="btn btn-primary btn-save"
-          >
-            {saving ? 'Saving...' : '✓ Save & Next'}
-          </button>
-
-          {images.length === 0 && !loading && (
-            <div className="empty-state">
-              <p>No images found in the directory.</p>
-              <p className="text-small">Check your IMAGE_DIRECTORY environment variable.</p>
-            </div>
-          )}
         </aside>
       </div>
 
