@@ -1,34 +1,45 @@
-import express from 'express';
-import { listFolders, createFolder, moveImageToFolders } from '../services/fileService.js';
+import express, { type Request, type Response } from 'express';
+import { createFolder, listFolders, moveImageToFolders } from '../services/fileService.js';
 
-const router = express.Router();
+type CreateFolderBody = {
+  folderName?: string;
+};
 
-export function initFolderRoutes(imageDirectory) {
-  router.get('/', async (req, res) => {
+type MoveImageBody = {
+  imageName?: string;
+  folderNames?: string[];
+};
+
+export function initFolderRoutes(imageDirectory: string) {
+  const router = express.Router();
+
+  router.get('/', async (_req: Request, res: Response) => {
     try {
       const folders = await listFolders(imageDirectory);
       res.json({ folders, count: folders.length });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      res.status(400).json({ error: message });
     }
   });
 
-  router.post('/create', async (req, res) => {
+  router.post('/create', async (req: Request<unknown, unknown, CreateFolderBody>, res: Response) => {
     try {
       const { folderName } = req.body;
-      
+
       if (!folderName) {
         return res.status(400).json({ error: 'folderName is required' });
       }
 
       const newFolder = await createFolder(imageDirectory, folderName);
-      res.status(201).json({ folder: newFolder, message: 'Folder created successfully' });
+      return res.status(201).json({ folder: newFolder, message: 'Folder created successfully' });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return res.status(400).json({ error: message });
     }
   });
 
-  router.post('/move-image', async (req, res) => {
+  router.post('/move-image', async (req: Request<unknown, unknown, MoveImageBody>, res: Response) => {
     try {
       const { imageName, folderNames } = req.body;
 
@@ -41,7 +52,7 @@ export function initFolderRoutes(imageDirectory) {
       }
 
       const result = await moveImageToFolders(imageDirectory, imageName, folderNames);
-      
+
       if (result.success.length === 0) {
         return res.status(400).json({
           error: 'Failed to move image to any folders',
@@ -49,17 +60,16 @@ export function initFolderRoutes(imageDirectory) {
         });
       }
 
-      res.json({
+      return res.json({
         message: 'Image moved successfully',
         success: result.success,
         failed: result.failed
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return res.status(400).json({ error: message });
     }
   });
 
   return router;
 }
-
-export default router;

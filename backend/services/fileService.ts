@@ -3,7 +3,18 @@ import path from 'path';
 
 const SUPPORTED_FORMATS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
-export async function scanImageDirectory(dirPath) {
+export type MoveResult = {
+  success: string[];
+  failed: Array<{ folder: string; reason: string }>;
+};
+
+export type ImageData = {
+  name: string;
+  size: number;
+  modified: string;
+};
+
+export async function scanImageDirectory(dirPath: string): Promise<string[]> {
   try {
     const stats = await fs.stat(dirPath);
     if (!stats.isDirectory()) {
@@ -11,21 +22,22 @@ export async function scanImageDirectory(dirPath) {
     }
 
     const files = await fs.readdir(dirPath);
-    const images = files.filter(file => {
+    const images = files.filter((file) => {
       const ext = path.extname(file).toLowerCase();
       return SUPPORTED_FORMATS.includes(ext);
     });
 
     return images.sort();
   } catch (error) {
-    throw new Error(`Failed to scan directory: ${error.message}`);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to scan directory: ${message}`);
   }
 }
 
-export async function listFolders(dirPath) {
+export async function listFolders(dirPath: string): Promise<string[]> {
   try {
     const files = await fs.readdir(dirPath);
-    const folders = [];
+    const folders: string[] = [];
 
     for (const file of files) {
       const fullPath = path.join(dirPath, file);
@@ -37,13 +49,13 @@ export async function listFolders(dirPath) {
 
     return folders.sort();
   } catch (error) {
-    throw new Error(`Failed to list folders: ${error.message}`);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to list folders: ${message}`);
   }
 }
 
-export async function createFolder(dirPath, folderName) {
+export async function createFolder(dirPath: string, folderName: string): Promise<string> {
   try {
-    // Validate folder name (no path separators, no empty)
     if (!folderName || folderName.includes('/') || folderName.includes('\\')) {
       throw new Error('Invalid folder name');
     }
@@ -52,34 +64,36 @@ export async function createFolder(dirPath, folderName) {
     await fs.mkdir(fullPath, { recursive: false });
     return folderName;
   } catch (error) {
-    if (error.code === 'EEXIST') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'EEXIST') {
       throw new Error('Folder already exists');
     }
-    throw new Error(`Failed to create folder: ${error.message}`);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to create folder: ${message}`);
   }
 }
 
-export async function moveImageToFolders(dirPath, imageName, folderNames) {
+export async function moveImageToFolders(
+  dirPath: string,
+  imageName: string,
+  folderNames: string[]
+): Promise<MoveResult> {
   try {
-    if (!folderNames || folderNames.length === 0) {
+    if (folderNames.length === 0) {
       throw new Error('No destination folders specified');
     }
 
     const sourceImagePath = path.join(dirPath, imageName);
-
-    // Verify source image exists
     const sourceStats = await fs.stat(sourceImagePath);
     if (!sourceStats.isFile()) {
       throw new Error('Source image is not a file');
     }
 
-    const results = { success: [], failed: [] };
+    const results: MoveResult = { success: [], failed: [] };
 
     for (const folderName of folderNames) {
       try {
         const destPath = path.join(dirPath, folderName, imageName);
 
-        // Check if destination already exists
         try {
           await fs.stat(destPath);
           results.failed.push({
@@ -87,39 +101,38 @@ export async function moveImageToFolders(dirPath, imageName, folderNames) {
             reason: 'File already exists in destination'
           });
           continue;
-        } catch (e) {
-          // File doesn't exist, good to proceed
+        } catch {
+          // Destination file does not exist, proceed.
         }
 
-        // Copy file to destination
-        const destDir = path.join(dirPath, folderName);
         await fs.copyFile(sourceImagePath, destPath);
         results.success.push(folderName);
       } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
         results.failed.push({
           folder: folderName,
-          reason: error.message
+          reason: message
         });
       }
     }
 
-    // If at least one copy succeeded, delete the source
     if (results.success.length > 0) {
       try {
         await fs.unlink(sourceImagePath);
       } catch (error) {
-        // Log but don't fail if deletion fails
-        console.error('Failed to delete source image:', error.message);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Failed to delete source image:', message);
       }
     }
 
     return results;
   } catch (error) {
-    throw new Error(`Failed to move image: ${error.message}`);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to move image: ${message}`);
   }
 }
 
-export async function getImageData(dirPath, imageName) {
+export async function getImageData(dirPath: string, imageName: string): Promise<ImageData> {
   try {
     const fullPath = path.join(dirPath, imageName);
     const stats = await fs.stat(fullPath);
@@ -134,6 +147,7 @@ export async function getImageData(dirPath, imageName) {
       modified: stats.mtime.toISOString()
     };
   } catch (error) {
-    throw new Error(`Failed to get image data: ${error.message}`);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to get image data: ${message}`);
   }
 }
