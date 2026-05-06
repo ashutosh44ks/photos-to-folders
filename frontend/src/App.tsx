@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ImageViewer from './components/ImageViewer'
 import FolderList from './components/FolderList'
-import CreateFolderModal from './components/CreateFolderModal'
+import FolderManagementModal from './components/FolderManagementModal'
 import { useImages, useFolders, useMoveImageToFolders } from './services/api'
+
+const IGNORED_FOLDERS_KEY = 'photos-to-folders:ignored-folders'
 
 export default function App() {
   const { data: images = [], isLoading } = useImages()
@@ -11,10 +13,28 @@ export default function App() {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedFolders, setSelectedFolders] = useState<string[]>([])
-  const [showModal, setShowModal] = useState(false)
+  const [showManagementModal, setShowManagementModal] = useState(false)
+  const [ignoredFolders, setIgnoredFolders] = useState<string[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [displayedImages, setDisplayedImages] = useState<string[]>([])
+
+  // Load ignored folders from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(IGNORED_FOLDERS_KEY)
+    if (stored) {
+      try {
+        setIgnoredFolders(JSON.parse(stored))
+      } catch (e) {
+        console.error('Failed to parse ignored folders:', e)
+      }
+    }
+  }, [])
+
+  // Save ignored folders to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(IGNORED_FOLDERS_KEY, JSON.stringify(ignoredFolders))
+  }, [ignoredFolders])
 
   const currentImage = displayedImages[currentImageIndex] ?? images[currentImageIndex]
 
@@ -113,10 +133,11 @@ export default function App() {
 
       <div className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
         <button
-          onClick={() => setShowModal(true)}
-          className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900"
+          onClick={() => setShowManagementModal(true)}
+          className="rounded-full border border-white/70 bg-white/80 p-2 text-sm font-medium text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900"
+          title="Manage folders"
         >
-          + New Folder
+          ⚙️
         </button>
       </div>
 
@@ -140,9 +161,10 @@ export default function App() {
       <div className="absolute bottom-4 left-4 right-4 z-20 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[24rem]">
         <div className="rounded-3xl border border-white/70 bg-white/82 shadow-2xl shadow-stone-900/10 backdrop-blur-xl sm:p-5">
           <FolderList
-            folders={folders}
+            folders={folders.filter((f) => !ignoredFolders.includes(f))}
             selectedFolders={selectedFolders}
             onToggleFolder={handleToggleFolder}
+            totalCount={folders.length}
           />
 
           <button
@@ -170,7 +192,14 @@ export default function App() {
         </div>
       )}
 
-      {showModal && <CreateFolderModal onClose={() => setShowModal(false)} />}
+      {showManagementModal && (
+        <FolderManagementModal
+          folders={folders}
+          ignoredFolders={ignoredFolders}
+          onClose={() => setShowManagementModal(false)}
+          onIgnoredFoldersChange={setIgnoredFolders}
+        />
+      )}
     </div>
   )
 }

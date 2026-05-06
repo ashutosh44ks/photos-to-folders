@@ -3,6 +3,8 @@ import type {
   ImageResponse,
   FolderResponse,
   CreateFolderResponse,
+  RenameFolderResponse,
+  DeleteFolderResponse,
   MoveImageResponse,
 } from '../types'
 
@@ -30,6 +32,32 @@ const createFolderApi = async (folderName: string): Promise<CreateFolderResponse
   if (!res.ok) {
     const data = await res.json()
     throw new Error(data.error || 'Failed to create folder')
+  }
+  return res.json()
+}
+
+const renameFolderApi = async (oldName: string, newName: string): Promise<RenameFolderResponse> => {
+  const res = await fetch(`${API_BASE}/folders/rename`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ oldName, newName }),
+  })
+  if (!res.ok) {
+    const data = await res.json()
+    throw new Error(data.error || 'Failed to rename folder')
+  }
+  return res.json()
+}
+
+const deleteFolderApi = async (folderName: string): Promise<DeleteFolderResponse> => {
+  const res = await fetch(`${API_BASE}/folders/delete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ folderName }),
+  })
+  if (!res.ok) {
+    const data = await res.json()
+    throw new Error(data.error || 'Failed to delete folder')
   }
   return res.json()
 }
@@ -71,6 +99,27 @@ export function useCreateFolder() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createFolderApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['folders'] })
+    },
+  })
+}
+
+export function useRenameFolder() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ oldName, newName }: { oldName: string; newName: string }) =>
+      renameFolderApi(oldName, newName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['folders'] })
+    },
+  })
+}
+
+export function useDeleteFolder() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteFolderApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['folders'] })
     },

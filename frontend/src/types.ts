@@ -13,6 +13,17 @@ export type CreateFolderResponse = {
   message: string;
 };
 
+export type RenameFolderResponse = {
+  folder: string;
+  oldName: string;
+  message: string;
+};
+
+export type DeleteFolderResponse = {
+  folderName: string;
+  message: string;
+};
+
 export type MoveFailure = {
   folder: string;
   reason: string;

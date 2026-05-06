@@ -4,25 +4,35 @@ type FolderListProps = {
   folders: string[]
   selectedFolders: string[]
   onToggleFolder: (folder: string) => void
+  totalCount?: number
 }
 
 const FolderList: FC<FolderListProps> = ({
   folders,
   selectedFolders,
   onToggleFolder,
+  totalCount,
 }) => {
+  const displayTotalCount = totalCount ?? folders.length
+
   return (
     <div className="flex max-h-[38vh] flex-col gap-2 overflow-hidden sm:max-h-[42vh]">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-stone-500">
           Destination folders
         </h3>
-        <p className="text-xs text-stone-500">{selectedFolders.length} selected</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-stone-500">{selectedFolders.length} selected</p>
+        </div>
       </div>
 
-      {folders.length === 0 ? (
+      {folders.length === 0 && displayTotalCount === 0 ? (
         <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50 px-2 py-3 text-center">
           <p className="text-sm text-stone-500">No folders yet. Create one to get started.</p>
+        </div>
+      ) : folders.length === 0 && displayTotalCount > 0 ? (
+        <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50 px-2 py-3 text-center">
+          <p className="text-sm text-stone-500">All folders are hidden. Unhide some in folder management.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2 overflow-y-auto pr-1">

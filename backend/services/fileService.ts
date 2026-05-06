@@ -151,3 +151,67 @@ export async function getImageData(dirPath: string, imageName: string): Promise<
     throw new Error(`Failed to get image data: ${message}`);
   }
 }
+
+export async function renameFolder(dirPath: string, oldName: string, newName: string): Promise<string> {
+  try {
+    if (!oldName || oldName.includes('/') || oldName.includes('\\')) {
+      throw new Error('Invalid old folder name');
+    }
+    if (!newName || newName.includes('/') || newName.includes('\\')) {
+      throw new Error('Invalid new folder name');
+    }
+
+    const oldPath = path.join(dirPath, oldName);
+    const newPath = path.join(dirPath, newName);
+
+    // Check if old folder exists
+    const oldStats = await fs.stat(oldPath);
+    if (!oldStats.isDirectory()) {
+      throw new Error('Source folder does not exist');
+    }
+
+    // Check if new folder name already exists
+    try {
+      await fs.stat(newPath);
+      throw new Error('Folder with new name already exists');
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Folder with new name already exists') {
+        throw error;
+      }
+      // File does not exist, proceed with rename
+    }
+
+    await fs.rename(oldPath, newPath);
+    return newName;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to rename folder: ${message}`);
+  }
+}
+
+export async function deleteFolder(dirPath: string, folderName: string): Promise<void> {
+  try {
+    if (!folderName || folderName.includes('/') || folderName.includes('\\')) {
+      throw new Error('Invalid folder name');
+    }
+
+    const fullPath = path.join(dirPath, folderName);
+
+    // Check if folder exists
+    const stats = await fs.stat(fullPath);
+    if (!stats.isDirectory()) {
+      throw new Error('Folder does not exist');
+    }
+
+    // Check if folder is empty
+    const files = await fs.readdir(fullPath);
+    if (files.length > 0) {
+      throw new Error('Folder is not empty');
+    }
+
+    await fs.rmdir(fullPath);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to delete folder: ${message}`);
+  }
+}

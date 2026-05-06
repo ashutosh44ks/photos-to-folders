@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from 'express';
-import { createFolder, listFolders, moveImageToFolders } from '../services/fileService.js';
+import { createFolder, listFolders, moveImageToFolders, renameFolder, deleteFolder } from '../services/fileService.js';
 
 type CreateFolderBody = {
   folderName?: string;
@@ -8,6 +8,15 @@ type CreateFolderBody = {
 type MoveImageBody = {
   imageName?: string;
   folderNames?: string[];
+};
+
+type RenameFolderBody = {
+  oldName?: string;
+  newName?: string;
+};
+
+type DeleteFolderBody = {
+  folderName?: string;
 };
 
 export function initFolderRoutes(imageDirectory: string) {
@@ -33,6 +42,41 @@ export function initFolderRoutes(imageDirectory: string) {
 
       const newFolder = await createFolder(imageDirectory, folderName);
       return res.status(201).json({ folder: newFolder, message: 'Folder created successfully' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return res.status(400).json({ error: message });
+    }
+  });
+
+  router.post('/rename', async (req: Request<unknown, unknown, RenameFolderBody>, res: Response) => {
+    try {
+      const { oldName, newName } = req.body;
+
+      if (!oldName) {
+        return res.status(400).json({ error: 'oldName is required' });
+      }
+      if (!newName) {
+        return res.status(400).json({ error: 'newName is required' });
+      }
+
+      const renamed = await renameFolder(imageDirectory, oldName, newName);
+      return res.json({ folder: renamed, oldName, message: 'Folder renamed successfully' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return res.status(400).json({ error: message });
+    }
+  });
+
+  router.post('/delete', async (req: Request<unknown, unknown, DeleteFolderBody>, res: Response) => {
+    try {
+      const { folderName } = req.body;
+
+      if (!folderName) {
+        return res.status(400).json({ error: 'folderName is required' });
+      }
+
+      await deleteFolder(imageDirectory, folderName);
+      return res.json({ folderName, message: 'Folder deleted successfully' });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       return res.status(400).json({ error: message });
