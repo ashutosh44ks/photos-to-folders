@@ -94,78 +94,78 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-50 flex-col gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-purple-600"></div>
-        <p className="text-gray-600">Loading images...</p>
+      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-stone-50 via-white to-stone-100 flex-col gap-4">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900"></div>
+        <p className="text-sm font-medium tracking-wide text-stone-600">Loading images...</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gray-50">
-      <header className="bg-linear-to-r from-purple-600 to-purple-800 text-white px-8 py-6 text-center shadow-md">
-        <h1 className="text-4xl font-bold mb-2">📁 Photos to Folders</h1>
-        <p className="text-lg opacity-90">Organize and move your images</p>
-      </header>
+    <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-stone-50 via-white to-stone-100 text-stone-900">
+      <div className="absolute inset-0">
+        <ImageViewer
+          imageName={currentImage}
+          imageIndex={currentImageIndex}
+          totalImages={displayedImages.length}
+        />
+      </div>
 
-      <div className="flex flex-1 max-w-7xl mx-auto w-full gap-8 px-8 py-8">
-        <div className="flex-1 flex flex-col gap-6">
-          <ImageViewer
-            imageName={currentImage}
-            imageIndex={currentImageIndex}
-            totalImages={displayedImages.length}
-          />
+      <div className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
+        <button
+          onClick={() => setShowModal(true)}
+          className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900"
+        >
+          + New Folder
+        </button>
+      </div>
 
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={handlePrevious}
-              disabled={currentImageIndex === 0 || displayedImages.length === 0}
-              className="px-6 py-3 bg-white border-2 border-gray-300 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:enabled:border-purple-600 hover:enabled:text-purple-600 transition-all"
-            >
-              ← Previous
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentImageIndex >= displayedImages.length - 1 || displayedImages.length === 0}
-              className="px-6 py-3 bg-white border-2 border-gray-300 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:enabled:border-purple-600 hover:enabled:text-purple-600 transition-all"
-            >
-              Next →
-            </button>
-          </div>
-        </div>
+      <div className="absolute right-4 top-4 z-20 flex gap-3 sm:right-6 sm:top-6">
+        <button
+          onClick={handlePrevious}
+          disabled={currentImageIndex === 0 || displayedImages.length === 0}
+          className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-semibold text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          ←
+        </button>
+        <button
+          onClick={handleNext}
+          disabled={currentImageIndex >= displayedImages.length - 1 || displayedImages.length === 0}
+          className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-semibold text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          →
+        </button>
+      </div>
 
-        <aside className="w-96 flex flex-col gap-6">
+      <div className="absolute bottom-4 left-4 right-4 z-20 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[24rem]">
+        <div className="rounded-3xl border border-white/70 bg-white/82 shadow-2xl shadow-stone-900/10 backdrop-blur-xl sm:p-5">
           <FolderList
             folders={folders}
             selectedFolders={selectedFolders}
             onToggleFolder={handleToggleFolder}
-            onCreateFolder={() => setShowModal(true)}
           />
 
           <button
             onClick={handleSaveAndNext}
-            disabled={selectedFolders.length === 0 || displayedImages.length === 0 || moveImageMutation.isPending}
-            className="w-full py-3 px-6 bg-linear-to-r from-purple-600 to-purple-800 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:enabled:shadow-lg hover:enabled:scale-105 transition-all"
+            disabled={
+              selectedFolders.length === 0 ||
+              displayedImages.length === 0 ||
+              moveImageMutation.isPending
+            }
+            className="mt-4 w-full rounded-2xl bg-stone-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-stone-900/15 transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {moveImageMutation.isPending ? 'Saving...' : '✓ Save & Next'}
+            {moveImageMutation.isPending ? 'Saving...' : 'Save & Next'}
           </button>
-
-          {displayedImages.length === 0 && !isLoading && (
-            <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <p className="text-gray-600">No images found in the directory.</p>
-              <p className="text-sm text-gray-500">Check your IMAGE_DIRECTORY environment variable.</p>
-            </div>
-          )}
-        </aside>
+        </div>
       </div>
 
       {error && (
-        <div className="fixed bottom-8 right-8 bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-lg max-w-md animate-in">
+        <div className="fixed bottom-6 right-6 z-30 max-w-md rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800 shadow-xl shadow-red-900/10">
           {error}
         </div>
       )}
       {success && (
-        <div className="fixed bottom-8 right-8 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-lg max-w-md animate-in">
+        <div className="fixed bottom-6 right-6 z-30 max-w-md rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-xl shadow-emerald-900/10">
           {success}
         </div>
       )}
