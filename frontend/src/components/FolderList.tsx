@@ -1,5 +1,6 @@
 import type { FC } from 'react'
 import { Checkbox } from './ui/checkbox'
+import { Kbd } from './ui/kbd'
 import type { FolderListLayout } from '../hooks/useLayoutSettings'
 
 type FolderListProps = {
@@ -46,7 +47,7 @@ const FolderList: FC<FolderListProps> = ({
         </div>
       ) : layout === 'horizontal' ? (
         <div className="flex flex-wrap gap-2">
-          {folders.map((folder) => (
+          {folders.map((folder, index) => (
             <label
               key={folder}
               className="flex-1 flex cursor-pointer items-center gap-2 rounded-full border border-stone-300 bg-white px-3 py-1.5 transition hover:border-stone-400 hover:shadow-sm"
@@ -55,13 +56,16 @@ const FolderList: FC<FolderListProps> = ({
                 checked={selectedFolders.includes(folder)}
                 onCheckedChange={() => onToggleFolder(folder)}
               />
-              <span className="truncate text-xs font-medium text-stone-700">{folder}</span>
+              <div className="flex items-center gap-2">
+                <span className="truncate text-xs font-medium text-stone-700">{folder}</span>
+                {index < 9 && <Kbd>{index + 1}</Kbd>}
+              </div>
             </label>
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-2 overflow-y-auto pr-1">
-          {folders.map((folder) => (
+          {folders.map((folder, index) => (
             <label
               key={folder}
               className="flex cursor-pointer items-center gap-3 rounded-2xl border border-transparent px-3 py-1.5 transition hover:border-white/60 hover:bg-white/60"
@@ -70,7 +74,10 @@ const FolderList: FC<FolderListProps> = ({
                 checked={selectedFolders.includes(folder)}
                 onCheckedChange={() => onToggleFolder(folder)}
               />
-              <span className="break-all text-sm font-medium text-stone-700">{folder}</span>
+              <div className="flex items-center gap-2 w-full">
+                <span className="break-all text-sm font-medium text-stone-700">{folder}</span>
+                {index < 9 && <Kbd className="ml-auto">{index + 1}</Kbd>}
+              </div>
             </label>
           ))}
         </div>

@@ -6,6 +6,8 @@ import FolderList from './components/FolderList'
 import FolderManagementModal from './components/FolderManagementModal'
 import { useImages, useFolders, useMoveImageToFolders } from './services/api'
 import { Button } from './components/ui/button'
+import { Kbd } from './components/ui/kbd'
+import { useHotkeys } from './hooks/useHotkeys'
 import { useIgnoredFolders } from './hooks/useIgnoredFolders'
 import { useLayoutSettings } from './hooks/useLayoutSettings'
 
@@ -19,6 +21,7 @@ export default function App() {
   const [showManagementModal, setShowManagementModal] = useState(false)
   const [ignoredFolders, setIgnoredFolders] = useIgnoredFolders()
   const { settings, updateLayout, toggleShowImagesLeft } = useLayoutSettings()
+  const visibleFolders = folders.filter((f) => !ignoredFolders.includes(f))
 
   const currentImage = displayedImages[currentImageIndex]
 
@@ -79,6 +82,19 @@ export default function App() {
     }
   }
 
+  // register hotkeys (1-9 toggle folders, Enter = save, arrows = prev/next)
+  useHotkeys({
+    onNext: handleNext,
+    onPrevious: handlePrevious,
+    onSave: handleSaveAndNext,
+    onFolderToggle: (index) => {
+      const folder = visibleFolders[index]
+      if (folder) handleToggleFolder(folder)
+    },
+    visibleFolders,
+    selectedFolders,
+  })
+
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-linear-to-br from-stone-50 via-white to-stone-100 flex-col gap-4">
@@ -117,8 +133,9 @@ export default function App() {
           variant="outline"
           size="icon"
           className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
+          title="Previous image (←)"
         >
-          <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
         </Button>
         <Button
           onClick={handleNext}
@@ -126,15 +143,16 @@ export default function App() {
           variant="outline"
           size="icon"
           className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
+          title="Next image (→)"
         >
-          <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
       <div className="absolute bottom-4 left-4 right-4 z-20 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[24rem]">
         <div className="rounded-3xl border border-white/70 bg-white/82 shadow-2xl shadow-stone-900/10 backdrop-blur-xl sm:p-5">
           <FolderList
-            folders={folders.filter((f) => !ignoredFolders.includes(f))}
+            folders={visibleFolders}
             selectedFolders={selectedFolders}
             onToggleFolder={handleToggleFolder}
             totalCount={folders.length}
