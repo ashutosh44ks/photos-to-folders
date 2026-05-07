@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useEffect, useRef } from 'react'
 import type {
   ImageResponse,
   FolderResponse,
@@ -80,11 +81,30 @@ const moveImageToFoldersApi = async (
 
 // React Query hooks
 export function useImages() {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['images'],
     queryFn: fetchImages,
     select: (data) => data.images || [],
   })
+
+  const [displayedImages, setDisplayedImages] = useState<string[]>([])
+  const hasInitializedDisplayedImages = useRef(false)
+
+  useEffect(() => {
+    if (!hasInitializedDisplayedImages.current && query.data) {
+      setDisplayedImages(query.data)
+      hasInitializedDisplayedImages.current = true
+    }
+  }, [query.data])
+
+  return {
+    data: query.data || [],
+    displayedImages,
+    setDisplayedImages,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+  }
 }
 
 export function useFolders() {

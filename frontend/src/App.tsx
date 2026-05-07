@@ -1,72 +1,45 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { Settings, ChevronLeft, ChevronRight } from 'lucide-react'
 import ImageViewer from './components/ImageViewer'
 import FolderList from './components/FolderList'
 import FolderManagementModal from './components/FolderManagementModal'
 import { useImages, useFolders, useMoveImageToFolders } from './services/api'
-
-const IGNORED_FOLDERS_KEY = 'photos-to-folders:ignored-folders'
+import { Button } from './components/ui/button'
+import { useIgnoredFolders } from './hooks/useIgnoredFolders'
+import { useLayoutSettings } from './hooks/useLayoutSettings'
 
 export default function App() {
-  const { data: images = [], isLoading } = useImages()
+  const { data: images = [], displayedImages, setDisplayedImages, isLoading } = useImages()
   const { data: folders = [] } = useFolders()
   const moveImageMutation = useMoveImageToFolders()
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedFolders, setSelectedFolders] = useState<string[]>([])
   const [showManagementModal, setShowManagementModal] = useState(false)
-  const [ignoredFolders, setIgnoredFolders] = useState<string[]>([])
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [displayedImages, setDisplayedImages] = useState<string[]>([])
+  const [ignoredFolders, setIgnoredFolders] = useIgnoredFolders()
+  const { settings, updateLayout, toggleShowImagesLeft } = useLayoutSettings()
 
-  // Load ignored folders from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem(IGNORED_FOLDERS_KEY)
-    if (stored) {
-      try {
-        setIgnoredFolders(JSON.parse(stored))
-      } catch (e) {
-        console.error('Failed to parse ignored folders:', e)
-      }
-    }
-  }, [])
-
-  // Save ignored folders to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem(IGNORED_FOLDERS_KEY, JSON.stringify(ignoredFolders))
-  }, [ignoredFolders])
-
-  const currentImage = displayedImages[currentImageIndex] ?? images[currentImageIndex]
-
-  // Initialize displayed images once
-  if (displayedImages.length === 0 && images.length > 0) {
-    setDisplayedImages(images)
-  }
+  const currentImage = displayedImages[currentImageIndex]
 
   const handleToggleFolder = (folderName: string) => {
     setSelectedFolders((prev) =>
       prev.includes(folderName) ? prev.filter((f) => f !== folderName) : [...prev, folderName]
     )
-    setSuccess('')
   }
 
   const handleSaveAndNext = async () => {
     if (selectedFolders.length === 0) {
-      setError('Please select at least one folder')
-      setTimeout(() => setError(''), 3000)
+      toast.error('Please select at least one folder')
       return
     }
 
     if (!currentImage) {
-      setError('No image to save')
-      setTimeout(() => setError(''), 3000)
+      toast.error('No image to save')
       return
     }
 
     try {
-      setError('')
-      setSuccess('')
-
       await moveImageMutation.mutateAsync({
         imageName: currentImage,
         folderNames: selectedFolders,
@@ -84,37 +57,31 @@ export default function App() {
         const nextIndex =
           currentImageIndex >= newImages.length ? newImages.length - 1 : currentImageIndex
         setCurrentImageIndex(nextIndex)
-        setSuccess('Image saved and moved to folders!')
+        toast.success('Image saved and moved to folders!')
       } else {
-        setSuccess('All images processed! 🎉')
+        toast.success('All images processed! 🎉')
       }
-
-      setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(message)
+      toast.error(message)
     }
   }
 
   const handlePrevious = () => {
     setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : 0))
     setSelectedFolders([])
-    setError('')
-    setSuccess('')
   }
 
   const handleNext = () => {
     if (currentImageIndex < displayedImages.length - 1) {
       setCurrentImageIndex((prev) => prev + 1)
       setSelectedFolders([])
-      setError('')
-      setSuccess('')
     }
   }
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-stone-50 via-white to-stone-100 flex-col gap-4">
+      <div className="flex h-screen w-full items-center justify-center bg-linear-to-br from-stone-50 via-white to-stone-100 flex-col gap-4">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900"></div>
         <p className="text-sm font-medium tracking-wide text-stone-600">Loading images...</p>
       </div>
@@ -122,7 +89,7 @@ export default function App() {
   }
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-stone-50 via-white to-stone-100 text-stone-900">
+    <div className="relative h-screen w-screen overflow-hidden bg-linear-to-br from-stone-50 via-white to-stone-100 text-stone-900">
       <div className="absolute inset-0">
         <ImageViewer
           imageName={currentImage}
@@ -132,30 +99,36 @@ export default function App() {
       </div>
 
       <div className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
-        <button
+        <Button
           onClick={() => setShowManagementModal(true)}
-          className="rounded-full border border-white/70 bg-white/80 p-2 text-sm font-medium text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900"
+          variant="outline"
+          size="icon"
           title="Manage folders"
+          className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
         >
-          ⚙️
-        </button>
+          <Settings className="h-4 w-4" />
+        </Button>
       </div>
 
       <div className="absolute right-4 top-4 z-20 flex gap-3 sm:right-6 sm:top-6">
-        <button
+        <Button
           onClick={handlePrevious}
           disabled={currentImageIndex === 0 || displayedImages.length === 0}
-          className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-semibold text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-40"
+          variant="outline"
+          size="icon"
+          className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
         >
-          ←
-        </button>
-        <button
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
           onClick={handleNext}
           disabled={currentImageIndex >= displayedImages.length - 1 || displayedImages.length === 0}
-          className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-semibold text-stone-700 shadow-lg shadow-stone-900/10 backdrop-blur-md transition hover:bg-white hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-40"
+          variant="outline"
+          size="icon"
+          className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
         >
-          →
-        </button>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
 
       <div className="absolute bottom-4 left-4 right-4 z-20 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[24rem]">
@@ -165,32 +138,24 @@ export default function App() {
             selectedFolders={selectedFolders}
             onToggleFolder={handleToggleFolder}
             totalCount={folders.length}
+            layout={settings.folderListLayout}
+            imagesLeft={displayedImages.length}
+            showImagesLeft={settings.showImagesLeft}
           />
 
-          <button
+          <Button
             onClick={handleSaveAndNext}
             disabled={
               selectedFolders.length === 0 ||
               displayedImages.length === 0 ||
               moveImageMutation.isPending
             }
-            className="mt-4 w-full rounded-2xl bg-stone-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-stone-900/15 transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-4 w-full"
           >
             {moveImageMutation.isPending ? 'Saving...' : 'Save & Next'}
-          </button>
+          </Button>
         </div>
       </div>
-
-      {error && (
-        <div className="fixed bottom-6 right-6 z-30 max-w-md rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800 shadow-xl shadow-red-900/10">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="fixed bottom-6 right-6 z-30 max-w-md rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-xl shadow-emerald-900/10">
-          {success}
-        </div>
-      )}
 
       {showManagementModal && (
         <FolderManagementModal
@@ -198,8 +163,13 @@ export default function App() {
           ignoredFolders={ignoredFolders}
           onClose={() => setShowManagementModal(false)}
           onIgnoredFoldersChange={setIgnoredFolders}
+          folderListLayout={settings.folderListLayout}
+          onLayoutChange={updateLayout}
+          showImagesLeft={settings.showImagesLeft}
+          onShowImagesLeftChange={toggleShowImagesLeft}
         />
       )}
+
     </div>
   )
 }
