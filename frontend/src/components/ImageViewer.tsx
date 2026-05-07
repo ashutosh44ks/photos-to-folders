@@ -23,7 +23,7 @@ const ImageViewer: FC<ImageViewerProps> = ({ imageName, imageIndex, totalImages 
         <img
           src={`/api/images/${imageName}`}
           alt={imageName}
-          className="h-full w-full object-contain p-4 sm:p-8"
+          className="h-full w-full object-contain"
           onError={(e) => {
             const img = e.target as HTMLImageElement
             img.src =
