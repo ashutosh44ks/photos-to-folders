@@ -20,10 +20,11 @@ export default function App() {
   const [selectedFolders, setSelectedFolders] = useState<string[]>([])
   const [showManagementModal, setShowManagementModal] = useState(false)
   const [ignoredFolders, setIgnoredFolders] = useIgnoredFolders()
-  const { settings, updateLayout, toggleShowImagesLeft } = useLayoutSettings()
+  const { settings, updateLayout, toggleShowImagesLeft, toggleShowPreviewImages } = useLayoutSettings()
   const visibleFolders = folders.filter((f) => !ignoredFolders.includes(f))
 
   const currentImage = displayedImages[currentImageIndex]
+  const previewImages = displayedImages.slice(currentImageIndex + 1, currentImageIndex + 3)
 
   const handleToggleFolder = (folderName: string) => {
     setSelectedFolders((prev) =>
@@ -175,6 +176,54 @@ export default function App() {
         </div>
       </div>
 
+      {settings.showPreviewImages && previewImages.length > 0 && (
+        <div className="absolute bottom-4 right-4 z-20 hidden w-[16rem] flex-col gap-3 sm:bottom-6 sm:right-6 sm:flex">
+          <div className="rounded-2xl border border-white/70 bg-white/82 p-3 shadow-2xl shadow-stone-900/10 backdrop-blur-xl">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Up next
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={toggleShowPreviewImages}
+                className="h-auto px-2 py-1 text-xs text-stone-400 hover:text-stone-600"
+              >
+                Hide
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {previewImages.map((imageName, index) => (
+                <div
+                  key={imageName}
+                  className="overflow-hidden rounded-xl border border-stone-200 bg-stone-100 shadow-sm"
+                >
+                  <div className="relative aspect-[4/3]">
+                    <img
+                      src={`/api/images/${imageName}`}
+                      alt={imageName}
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement
+                        img.src =
+                          'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23e7e5e4" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="18" fill="%23999"%3EPreview not found%3C/text%3E%3C/svg%3E'
+                      }}
+                    />
+                    <div className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
+                      {index + 1}
+                    </div>
+                  </div>
+                  <div className="truncate px-3 py-2 text-xs text-stone-600" title={imageName}>
+                    {imageName}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showManagementModal && (
         <FolderManagementModal
           folders={folders}
@@ -185,6 +234,8 @@ export default function App() {
           onLayoutChange={updateLayout}
           showImagesLeft={settings.showImagesLeft}
           onShowImagesLeftChange={toggleShowImagesLeft}
+          showPreviewImages={settings.showPreviewImages}
+          onShowPreviewImagesChange={toggleShowPreviewImages}
         />
       )}
 

@@ -5,6 +5,7 @@ export type FolderListLayout = 'list' | 'horizontal'
 type LayoutSettings = {
   folderListLayout: FolderListLayout
   showImagesLeft: boolean
+  showPreviewImages: boolean
 }
 
 const LAYOUT_SETTINGS_KEY = 'photos-to-folders:layout-settings'
@@ -12,6 +13,7 @@ const LAYOUT_SETTINGS_KEY = 'photos-to-folders:layout-settings'
 const DEFAULT_SETTINGS: LayoutSettings = {
   folderListLayout: 'list',
   showImagesLeft: false,
+  showPreviewImages: true,
 }
 
 export function useLayoutSettings() {
@@ -44,5 +46,9 @@ export function useLayoutSettings() {
     setSettings((prev) => ({ ...prev, showImagesLeft: !prev.showImagesLeft }))
   }
 
-  return { settings, updateLayout, toggleShowImagesLeft }
+  const toggleShowPreviewImages = () => {
+    setSettings((prev) => ({ ...prev, showPreviewImages: !prev.showPreviewImages }))
+  }
+
+  return { settings, updateLayout, toggleShowImagesLeft, toggleShowPreviewImages }
 }

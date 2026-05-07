@@ -17,6 +17,8 @@ type FolderManagementModalProps = {
   onLayoutChange?: (layout: 'list' | 'horizontal') => void
   showImagesLeft?: boolean
   onShowImagesLeftChange?: (show: boolean) => void
+  showPreviewImages?: boolean
+  onShowPreviewImagesChange?: (show: boolean) => void
 }
 
 const FolderManagementModal: FC<FolderManagementModalProps> = ({
@@ -28,6 +30,8 @@ const FolderManagementModal: FC<FolderManagementModalProps> = ({
   onLayoutChange,
   showImagesLeft = false,
   onShowImagesLeftChange,
+  showPreviewImages = true,
+  onShowPreviewImagesChange,
 }) => {
   const [newFolderName, setNewFolderName] = useState('')
   const [renamingFolder, setRenamingFolder] = useState<string | null>(null)
@@ -169,6 +173,16 @@ const FolderManagementModal: FC<FolderManagementModalProps> = ({
               />
               <label htmlFor="show-images-left" className="text-sm cursor-pointer">
                 Show images left to process
+              </label>
+            </div>
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="show-preview-images"
+                checked={showPreviewImages}
+                onCheckedChange={() => onShowPreviewImagesChange?.(!showPreviewImages)}
+              />
+              <label htmlFor="show-preview-images" className="text-sm cursor-pointer">
+                Show next image previews
               </label>
             </div>
           </div>
