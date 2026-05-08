@@ -1,11 +1,20 @@
 import { cn } from "@/lib/utils"
 
-function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
+type KbdSize = 'sm' | 'md' | 'lg'
+
+function Kbd({ className, size = 'md', ...props }: React.ComponentProps<"kbd"> & { size?: KbdSize }) {
+  const sizeClasses: Record<KbdSize, string> = {
+    sm: "h-4 min-w-4 px-1 text-2xs",
+    md: "h-5 min-w-5 px-1 text-xs",
+    lg: "h-6 min-w-6 px-1.5 text-sm",
+  }
+
   return (
     <kbd
       data-slot="kbd"
       className={cn(
-        "pointer-events-none inline-flex h-5 w-fit min-w-5 items-center justify-center gap-1 rounded-sm bg-muted px-1 font-sans text-xs font-medium text-muted-foreground select-none in-data-[slot=tooltip-content]:bg-background/20 in-data-[slot=tooltip-content]:text-background dark:in-data-[slot=tooltip-content]:bg-background/10 [&_svg:not([class*='size-'])]:size-3",
+        "pointer-events-none inline-flex w-fit items-center justify-center gap-1 rounded-sm bg-muted font-sans font-medium text-muted-foreground select-none in-data-[slot=tooltip-content]:bg-background/20 in-data-[slot=tooltip-content]:text-background dark:in-data-[slot=tooltip-content]:bg-background/10 [&_svg:not([class*='size-'])]:size-3",
+        sizeClasses[size],
         className
       )}
       {...props}

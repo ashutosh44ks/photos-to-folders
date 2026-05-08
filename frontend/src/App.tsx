@@ -172,6 +172,9 @@ export default function App() {
             className="mt-4 w-full"
           >
             {moveImageMutation.isPending ? 'Saving...' : 'Save & Next'}
+            <Kbd size='sm' className='text-stone-500'>
+              ⏎
+            </Kbd>
           </Button>
         </div>
       </div>
