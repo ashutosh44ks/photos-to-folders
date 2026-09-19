@@ -4,6 +4,7 @@ import { Settings, ChevronLeft, ChevronRight } from 'lucide-react'
 import ImageViewer from './components/ImageViewer'
 import FolderList from './components/FolderList'
 import FolderManagementModal from './components/FolderManagementModal'
+import SettingsHintOverlay from './components/SettingsHintOverlay'
 import { useImages, useFolders, useMoveImageToFolders } from './services/api'
 import { Button } from './components/ui/button'
 import { Kbd } from './components/ui/kbd'
@@ -118,43 +119,7 @@ export default function App() {
       </div>
 
       {showSettingsHint && (
-        <>
-          <div
-            key={`spotlight-${hintKey}`}
-            aria-hidden
-            className="hint-spotlight pointer-events-none absolute inset-0 z-15"
-            style={{
-              background:
-                'radial-gradient(circle 56px at 40px 40px, transparent 0%, transparent 55%, rgb(0 0 0 / 0.35) 100%)',
-            }}
-          />
-          <svg
-            key={`arrow-${hintKey}`}
-            aria-hidden
-            className="hint-arrow pointer-events-none absolute inset-0 z-25 h-full w-full"
-          >
-            <defs>
-              <marker
-                id="hint-arrowhead"
-                markerWidth="8"
-                markerHeight="8"
-                refX="6"
-                refY="4"
-                orient="auto"
-              >
-                <path d="M0,0 L8,4 L0,8 Z" fill="rgb(28 25 23 / 0.85)" />
-              </marker>
-            </defs>
-            <path
-              d="M 150 420 C 90 280, 55 140, 48 56"
-              fill="none"
-              stroke="rgb(28 25 23 / 0.75)"
-              strokeWidth="2"
-              strokeDasharray="6 5"
-              markerEnd="url(#hint-arrowhead)"
-            />
-          </svg>
-        </>
+        <SettingsHintOverlay hintKey={hintKey} imageName={currentImage} />
       )}
 
       <div className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
