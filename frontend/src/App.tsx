@@ -12,6 +12,7 @@ import { useHotkeys } from './hooks/useHotkeys'
 import { useIgnoredFolders } from './hooks/useIgnoredFolders'
 import { useLayoutSettings } from './hooks/useLayoutSettings'
 import { useSettingsHint } from './hooks/useSettingsHint'
+import { fireConfetti } from './lib/confetti'
 
 export default function App() {
   const { data: images = [], displayedImages, setDisplayedImages, isLoading } = useImages()
@@ -21,6 +22,7 @@ export default function App() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedFolders, setSelectedFolders] = useState<string[]>([])
   const [showManagementModal, setShowManagementModal] = useState(false)
+  const [sessionComplete, setSessionComplete] = useState(false)
   const { active: showSettingsHint, key: hintKey, trigger: handleEmptyFoldersHint } = useSettingsHint()
   const [ignoredFolders, setIgnoredFolders] = useIgnoredFolders()
   const { settings, updateLayout, toggleShowImagesLeft, toggleShowPreviewImages } = useLayoutSettings()
@@ -66,6 +68,8 @@ export default function App() {
         setCurrentImageIndex(nextIndex)
         toast.success('Image saved and moved to folders!')
       } else {
+        setSessionComplete(true)
+        fireConfetti()
         toast.success('All images processed! 🎉')
       }
     } catch (err) {
@@ -115,6 +119,7 @@ export default function App() {
           imageName={currentImage}
           imageIndex={currentImageIndex}
           totalImages={displayedImages.length}
+          emptyReason={sessionComplete ? 'complete' : 'empty'}
         />
       </div>
 
