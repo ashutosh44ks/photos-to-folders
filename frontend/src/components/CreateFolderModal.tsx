@@ -1,6 +1,6 @@
 import { useState, type FC, type FormEvent, type KeyboardEvent } from 'react'
 import { toast } from 'sonner'
-import { useCreateFolder } from '../services/api'
+import { useCreateFolder } from '../services/hooks'
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog'
 import { Input } from './ui/input'
 import { Button } from './ui/button'

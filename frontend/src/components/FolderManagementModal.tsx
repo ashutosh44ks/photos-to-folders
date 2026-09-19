@@ -1,7 +1,7 @@
 import { useState, type FC, type FormEvent, type KeyboardEvent } from 'react'
 import { toast } from 'sonner'
 import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react'
-import { useCreateFolder, useRenameFolder, useDeleteFolder } from '../services/api'
+import { useCreateFolder, useRenameFolder, useDeleteFolder } from '../services/hooks'
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
