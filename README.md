@@ -25,54 +25,38 @@ A web app to organize and bulk-move images into multiple folders. View images on
 - Node.js (v14+)
 - npm or yarn
 
-### Backend Setup
+**macOS / Linux**
+```bash
+./setup.sh
+```
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+**Windows** (Git Bash or WSL)
+```bash
+bash setup.sh
+```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+This installs backend and frontend dependencies and creates `backend/.env` from `.env.example` if missing.
 
-3. Create `.env` file (copy from `.env.example`):
-   ```bash
-   cp .env.example .env
-   ```
+Edit `backend/.env` and set your image directory:
 
-4. Edit `.env` and set your image directory:
-   ```
-   PORT=5000
-   IMAGE_DIRECTORY=/path/to/your/images
-   ```
+```
+PORT=5000
+IMAGE_DIRECTORY=/path/to/your/images
+```
 
-5. Start the backend server:
-   ```bash
-   npm run dev
-   ```
-   
-   The server will run on `http://localhost:5000`
+## Start servers
 
-### Frontend Setup
+**macOS / Linux**
+```bash
+./start-server.sh
+```
 
-1. In a new terminal, navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
+**Windows** (Git Bash or WSL)
+```bash
+bash start-server.sh
+```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   
-   The app will open at `http://localhost:3000`
+Starts backend (`http://localhost:5000`) and frontend (`http://localhost:3000`). Ctrl+C stops both.
 
 ## Usage
 
@@ -125,6 +109,8 @@ Output will be in `frontend/dist/`
 
 ```
 photos-to-folders/
+├── setup.sh
+├── start-server.sh
 ├── backend/
 │   ├── server.js              # Express server entry point
 │   ├── routes/
