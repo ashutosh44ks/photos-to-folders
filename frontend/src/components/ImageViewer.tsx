@@ -26,17 +26,17 @@ const ImageViewer: FC<ImageViewerProps> = ({
   if (!imageName) {
     const copy = EMPTY_COPY[emptyReason]
     return (
-      <div className="relative h-full w-full overflow-hidden bg-stone-100">
+      <div className="relative h-full w-full overflow-hidden bg-muted">
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-          <p className="text-base font-semibold text-stone-800">{copy.title}</p>
-          <p className="text-sm font-medium text-stone-500">{copy.subtitle}</p>
+          <p className="text-base font-semibold text-foreground">{copy.title}</p>
+          <p className="text-sm font-medium text-muted-foreground">{copy.subtitle}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-stone-100">
+    <div className="relative h-full w-full overflow-hidden bg-muted">
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         <img
           src={`/api/images/${imageName}`}

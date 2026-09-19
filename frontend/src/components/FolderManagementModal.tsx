@@ -1,6 +1,7 @@
 import { useState, type FC, type FormEvent, type KeyboardEvent } from 'react'
 import { toast } from 'sonner'
-import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Pencil, Trash2, Monitor, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useCreateFolder, useRenameFolder, useDeleteFolder } from '../services/hooks'
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog'
 import { Input } from './ui/input'
@@ -21,6 +22,12 @@ type FolderManagementModalProps = {
   onShowPreviewImagesChange?: (show: boolean) => void
 }
 
+const THEME_OPTIONS = [
+  { value: 'system', label: 'System', icon: Monitor },
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'dark', label: 'Dark', icon: Moon },
+] as const
+
 const FolderManagementModal: FC<FolderManagementModalProps> = ({
   folders,
   ignoredFolders,
@@ -36,6 +43,7 @@ const FolderManagementModal: FC<FolderManagementModalProps> = ({
   const [newFolderName, setNewFolderName] = useState('')
   const [renamingFolder, setRenamingFolder] = useState<string | null>(null)
   const [renameFolderName, setRenameFolderName] = useState('')
+  const { theme, setTheme } = useTheme()
 
   const createFolderMutation = useCreateFolder()
   const renameFolderMutation = useRenameFolder()
@@ -145,7 +153,24 @@ const FolderManagementModal: FC<FolderManagementModalProps> = ({
           <h3 className="font-semibold mb-4">Display Settings</h3>
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-stone-600 mb-2">Folder List Layout</p>
+              <p className="text-sm text-muted-foreground mb-2">Theme</p>
+              <div className="flex gap-2">
+                {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
+                  <Button
+                    key={value}
+                    onClick={() => setTheme(value)}
+                    variant={theme === value ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Folder List Layout</p>
               <div className="flex gap-2">
                 <Button
                   onClick={() => onLayoutChange?.('list')}

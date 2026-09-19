@@ -14,7 +14,6 @@ body,
 body {
 	margin: 0;
 	overflow: hidden;
-	background: #fafaf9;
 }
 
 @theme inline {

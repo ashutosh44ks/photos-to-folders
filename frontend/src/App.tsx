@@ -105,15 +105,15 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-linear-to-br from-stone-50 via-white to-stone-100 flex-col gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900"></div>
-        <p className="text-sm font-medium tracking-wide text-stone-600">Loading images...</p>
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-foreground"></div>
+        <p className="text-sm font-medium tracking-wide text-muted-foreground">Loading images...</p>
       </div>
     )
   }
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-linear-to-br from-stone-50 via-white to-stone-100 text-stone-900">
+    <div className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
       <div className="absolute inset-0">
         <ImageViewer
           imageName={currentImage}
@@ -133,7 +133,7 @@ export default function App() {
           variant="outline"
           size="icon"
           title="Manage folders"
-          className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
+          className="rounded-full border-border/70 bg-background/80 shadow-lg shadow-foreground/10 backdrop-blur-md hover:bg-background"
         >
           <Settings className="h-4 w-4" />
         </Button>
@@ -145,7 +145,7 @@ export default function App() {
           disabled={currentImageIndex === 0 || displayedImages.length === 0}
           variant="outline"
           size="icon"
-          className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
+          className="rounded-full border-border/70 bg-background/80 shadow-lg shadow-foreground/10 backdrop-blur-md hover:bg-background"
           title="Previous image (←)"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -155,7 +155,7 @@ export default function App() {
           disabled={currentImageIndex >= displayedImages.length - 1 || displayedImages.length === 0}
           variant="outline"
           size="icon"
-          className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
+          className="rounded-full border-border/70 bg-background/80 shadow-lg shadow-foreground/10 backdrop-blur-md hover:bg-background"
           title="Next image (→)"
         >
           <ChevronRight className="h-4 w-4" />
@@ -163,7 +163,7 @@ export default function App() {
       </div>
 
       <div className="absolute bottom-4 left-4 right-4 z-20 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[24rem]">
-        <div className="rounded-3xl border border-white/70 bg-white/82 shadow-2xl shadow-stone-900/10 backdrop-blur-xl sm:p-5">
+        <div className="rounded-3xl border border-border/70 bg-background/82 shadow-2xl shadow-foreground/10 backdrop-blur-xl sm:p-5">
           <FolderList
             folders={visibleFolders}
             selectedFolders={selectedFolders}
@@ -185,7 +185,7 @@ export default function App() {
             className="mt-4 w-full"
           >
             {moveImageMutation.isPending ? 'Saving...' : 'Save & Next'}
-            <Kbd size="sm" className="text-stone-500">
+            <Kbd size="sm" className="text-muted-foreground">
               ⏎
             </Kbd>
           </Button>
@@ -194,9 +194,9 @@ export default function App() {
 
       {settings.showPreviewImages && previewImages.length > 0 && (
         <div className="absolute bottom-4 right-4 z-20 hidden w-[16rem] flex-col gap-3 sm:bottom-6 sm:right-6 sm:flex">
-          <div className="rounded-2xl border border-white/70 bg-white/82 p-3 shadow-2xl shadow-stone-900/10 backdrop-blur-xl">
+          <div className="rounded-2xl border border-border/70 bg-background/82 p-3 shadow-2xl shadow-foreground/10 backdrop-blur-xl">
             <div className="mb-3 flex items-center justify-between gap-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Up next
               </p>
               <Button
@@ -204,7 +204,7 @@ export default function App() {
                 variant="ghost"
                 size="sm"
                 onClick={toggleShowPreviewImages}
-                className="h-auto px-2 py-1 text-xs text-stone-400 hover:text-stone-600"
+                className="h-auto px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 Hide
               </Button>
@@ -213,7 +213,7 @@ export default function App() {
               {previewImages.map((imageName, index) => (
                 <div
                   key={imageName}
-                  className="overflow-hidden rounded-xl border border-stone-200 bg-stone-100 shadow-sm"
+                  className="overflow-hidden rounded-xl border border-border bg-muted shadow-sm"
                 >
                   <div className="relative aspect-[4/3]">
                     <img
@@ -230,7 +230,7 @@ export default function App() {
                       {index + 1}
                     </div>
                   </div>
-                  <div className="truncate px-3 py-2 text-xs text-stone-600" title={imageName}>
+                  <div className="truncate px-3 py-2 text-xs text-muted-foreground" title={imageName}>
                     {imageName}
                   </div>
                 </div>
