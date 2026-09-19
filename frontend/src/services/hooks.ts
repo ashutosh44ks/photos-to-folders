@@ -27,7 +27,6 @@ export function useImages() {
   }, [query.data])
 
   return {
-    data: query.data || [],
     displayedImages,
     setDisplayedImages,
     isLoading: query.isLoading,

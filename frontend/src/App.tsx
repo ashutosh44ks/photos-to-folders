@@ -15,7 +15,7 @@ import { useSettingsHint } from './hooks/useSettingsHint'
 import { fireConfetti } from './lib/confetti'
 
 export default function App() {
-  const { data: images = [], displayedImages, setDisplayedImages, isLoading } = useImages()
+  const { displayedImages, setDisplayedImages, isLoading } = useImages()
   const { data: folders = [] } = useFolders()
   const moveImageMutation = useMoveImageToFolders()
 
