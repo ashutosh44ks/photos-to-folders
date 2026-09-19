@@ -4,6 +4,8 @@ A local web app to sort images from a single inbox folder into destination folde
 
 ## Demo
 
+Sound on — the clicks are the whole point.
+
 https://github.com/user-attachments/assets/70188fc4-a666-42fe-bea7-f9442b343fc6
 
 ## Features
@@ -87,7 +89,6 @@ photos-to-folders/
 ├── setup.sh
 ├── start-server.sh
 ├── test-images/               # default inbox
-├── docs/                      # README demo video
 ├── backend/
 │   ├── server.ts
 │   ├── routes/
