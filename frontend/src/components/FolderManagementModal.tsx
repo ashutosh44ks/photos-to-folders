@@ -289,7 +289,7 @@ const FolderManagementModal: FC<FolderManagementModalProps> = ({
                         <Button
                           onClick={() => {
                             setRenamingFolder(folder)
-                            setRenameFolderName('')
+                            setRenameFolderName(folder)
                           }}
                           disabled={renamingFolder !== null}
                           size="icon-sm"

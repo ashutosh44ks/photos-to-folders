@@ -81,7 +81,7 @@ const FolderListBody: FC<FolderListBodyProps> = ({
         {folders.map((folder, index) => (
           <label
             key={folder}
-            className="flex cursor-pointer items-center gap-3 rounded-2xl border border-transparent px-3 py-1.5 transition hover:border-border hover:bg-muted/60"
+            className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-background px-3 py-1.5 transition hover:border-foreground/30 hover:shadow-sm"
           >
             <Checkbox
               checked={selectedFolders.includes(folder)}
