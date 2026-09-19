@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export type FolderListLayout = 'list' | 'horizontal'
+export type FolderListLayout = 'vertical' | 'horizontal'
 
 type LayoutSettings = {
   folderListLayout: FolderListLayout
@@ -11,7 +11,7 @@ type LayoutSettings = {
 const LAYOUT_SETTINGS_KEY = 'photos-to-folders:layout-settings'
 
 const DEFAULT_SETTINGS: LayoutSettings = {
-  folderListLayout: 'list',
+  folderListLayout: 'vertical',
   showImagesLeft: false,
   showPreviewImages: true,
 }

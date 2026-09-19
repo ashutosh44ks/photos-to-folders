@@ -8,14 +8,15 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
 import { Checkbox } from './ui/checkbox'
+import type { FolderListLayout } from '../hooks/useLayoutSettings'
 
 type FolderManagementModalProps = {
   folders: string[]
   ignoredFolders: string[]
   onClose: () => void
   onIgnoredFoldersChange: (ignored: string[]) => void
-  folderListLayout?: 'list' | 'horizontal'
-  onLayoutChange?: (layout: 'list' | 'horizontal') => void
+  folderListLayout?: FolderListLayout
+  onLayoutChange?: (layout: FolderListLayout) => void
   showImagesLeft?: boolean
   onShowImagesLeftChange?: (show: boolean) => void
   showPreviewImages?: boolean
@@ -33,7 +34,7 @@ const FolderManagementModal: FC<FolderManagementModalProps> = ({
   ignoredFolders,
   onClose,
   onIgnoredFoldersChange,
-  folderListLayout = 'list',
+  folderListLayout = 'vertical',
   onLayoutChange,
   showImagesLeft = false,
   onShowImagesLeftChange,
@@ -173,8 +174,8 @@ const FolderManagementModal: FC<FolderManagementModalProps> = ({
               <p className="text-sm text-muted-foreground mb-2">Folder List Layout</p>
               <div className="flex gap-2">
                 <Button
-                  onClick={() => onLayoutChange?.('list')}
-                  variant={folderListLayout === 'list' ? 'default' : 'outline'}
+                  onClick={() => onLayoutChange?.('vertical')}
+                  variant={folderListLayout === 'vertical' ? 'default' : 'outline'}
                   size="sm"
                   className="flex-1"
                 >
