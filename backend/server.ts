@@ -2,22 +2,26 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { initImageRoutes } from './routes/images.js';
 import { initFolderRoutes } from './routes/folders.js';
 
-dotenv.config();
+const BACKEND_ROOT = path.basename(path.dirname(fileURLToPath(import.meta.url))) === 'dist'
+  ? path.dirname(path.dirname(fileURLToPath(import.meta.url)))
+  : path.dirname(fileURLToPath(import.meta.url));
+
+dotenv.config({ path: path.join(BACKEND_ROOT, '.env') });
 
 const app = express();
 const PORT = Number(process.env.PORT ?? '5000');
 const IMAGE_DIRECTORY = process.env.IMAGE_DIRECTORY;
 
 if (!IMAGE_DIRECTORY) {
-  console.error('ERROR: IMAGE_DIRECTORY environment variable is not set');
-  console.error('Please create a .env file with IMAGE_DIRECTORY=/path/to/images');
+  console.error('ERROR: IMAGE_DIRECTORY environment variable is not set in the .env file');
   process.exit(1);
 }
 
-const RESOLVED_IMAGE_DIRECTORY = path.resolve(IMAGE_DIRECTORY);
+const RESOLVED_IMAGE_DIRECTORY = path.resolve(BACKEND_ROOT, IMAGE_DIRECTORY);
 
 console.log(`Using image directory: ${RESOLVED_IMAGE_DIRECTORY}`);
 

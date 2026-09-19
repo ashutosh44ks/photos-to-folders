@@ -1,158 +1,119 @@
 # Photos to Folders
 
-A web app to organize and bulk-move images into multiple folders. View images one at a time, create destination folders on the fly, toggle-select multiple folders per image, then save to move the image to all selected folders.
+A local web app to sort images from a single inbox folder into destination folders. View one image at a time, pick one or more folders, then save to move the file (copied into each selected folder, then removed from the inbox).
+
+## Demo
+
+<video src="docs/brag.mp4" poster="docs/brag.jpg" controls playsinline width="100%"></video>
 
 ## Features
 
-- 🖼️ View images one at a time with a clean UI
-- 📁 Create new folders directly from the app
-- ✓ Toggle-select multiple destination folders per image
-- 🚀 Move images to selected folders with a single click
-- ⚡ Auto-advance to the next image after saving
-- 🎯 Navigate previous/next with keyboard shortcuts
-- 📦 Supports JPG, PNG, GIF, WebP formats
+- One-at-a-time viewer for JPG, PNG, GIF, and WebP
+- Create, rename, and delete destination folders (delete only if empty)
+- Hide folders you do not want in the picker
+- Multi-select destinations per image, then Save & Next
+- Keyboard: `←` / `→` navigate, `1`–`9` toggle folders, `Enter` save
+- Light / dark / system theme
+- Optional upcoming-image previews and remaining-count
+- Folder list layout (vertical or horizontal)
 
 ## Tech Stack
 
-- **Backend**: Node.js + Express
-- **Frontend**: React + Vite
-- **Config**: Environment variables (.env)
+- **Backend**: Node.js, Express, TypeScript
+- **Frontend**: React 19, Vite, TypeScript, Tailwind, React Query
+- **Config**: `backend/.env` (`PORT`, `IMAGE_DIRECTORY`)
 
 ## Setup
 
-### Prerequisites
+Needs Node.js 20+ and npm.
 
-- Node.js (v14+)
-- npm or yarn
-
-**macOS / Linux**
 ```bash
-./setup.sh
+./setup.sh          # macOS / Linux
+bash setup.sh       # Windows (Git Bash or WSL)
 ```
 
-**Windows** (Git Bash or WSL)
-```bash
-bash setup.sh
-```
+Installs backend and frontend deps and copies `backend/.env.example` to `backend/.env` if missing.
 
-This installs backend and frontend dependencies and creates `backend/.env` from `.env.example` if missing.
-
-Edit `backend/.env` and set your image directory:
+Default inbox is repo-root `test-images` (`IMAGE_DIRECTORY=../test-images` from the backend folder). Drop sample files there, or point `IMAGE_DIRECTORY` at your library (relative to `backend/` or absolute). Destination folders are created as subdirectories of that path. Only files sitting in the inbox root are listed — files already inside subfolders are not.
 
 ```
 PORT=5000
-IMAGE_DIRECTORY=/path/to/your/images
+IMAGE_DIRECTORY=../test-images
 ```
 
-## Start servers
+## Start
 
-**macOS / Linux**
 ```bash
-./start-server.sh
+./start-server.sh          # macOS / Linux
+bash start-server.sh       # Windows (Git Bash or WSL)
 ```
 
-**Windows** (Git Bash or WSL)
-```bash
-bash start-server.sh
-```
-
-Starts backend (`http://localhost:5000`) and frontend (`http://localhost:3000`). Ctrl+C stops both.
+Backend: `http://localhost:5000`. Frontend: `http://localhost:3000` (proxies `/api` to the backend). Ctrl+C stops both.
 
 ## Usage
 
-1. **View Images**: The app displays images from your configured directory one at a time
-2. **Create Folders**: Click "+ New Folder" to create destination folders (created inside your image directory)
-3. **Select Folders**: Toggle checkboxes to select multiple folders for the current image
-4. **Save & Move**: Click "✓ Save & Next" to move the image to all selected folders and auto-advance to the next image
-5. **Navigate**: Use "Previous/Next" buttons to browse images without saving
+1. Open the app; the current inbox image fills the screen.
+2. Open settings (gear) to create/rename/delete folders, hide folders, or change theme and layout.
+3. Toggle destination folders for the current image (`1`–`9` or click).
+4. **Save & Next** (`Enter`) copies the file into each selected folder, deletes it from the inbox, and advances.
+5. Skip without saving using Previous / Next (`←` / `→`).
 
-## Workflow
+## API
 
-1. Image appears in the viewer
-2. Select one or more destination folders
-3. Click "Save & Next"
-4. Image is **moved** (not copied) to all selected folders
-5. Automatically advance to the next image
-6. Repeat until all images are organized
+Local-only. There is no auth.
 
-## API Endpoints
-
-### Images
-- `GET /api/images` - Get list of all images in the directory
-- `GET /api/images/:imageName` - Get metadata for a specific image
-
-### Folders
-- `GET /api/folders` - Get list of all folders in the directory
-- `POST /api/folders/create` - Create a new folder
-  ```json
-  { "folderName": "Archive" }
-  ```
-- `POST /api/folders/move-image` - Move image to folders
-  ```json
-  { "imageName": "photo.jpg", "folderNames": ["Archive", "Backup"] }
-  ```
-
-### Health Check
-- `GET /api/health` - Check server status
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/images` | List inbox image filenames |
+| `GET` | `/api/images/:imageName` | Serve the image file |
+| `GET` | `/api/folders` | List subfolders of `IMAGE_DIRECTORY` |
+| `POST` | `/api/folders/create` | `{ "folderName": "Archive" }` |
+| `POST` | `/api/folders/rename` | `{ "oldName": "Archive", "newName": "Keep" }` |
+| `POST` | `/api/folders/delete` | `{ "folderName": "Archive" }` (empty folders only) |
+| `POST` | `/api/folders/move-image` | `{ "imageName": "photo.jpg", "folderNames": ["Archive", "Backup"] }` |
+| `GET` | `/api/health` | `{ status, imageDirectory }` |
 
 ## Development
 
-### Build Frontend for Production
 ```bash
-cd frontend
-npm run build
+cd backend && npm run dev    # tsx watch
+cd frontend && npm run dev   # Vite on :3000
+cd backend && npm run build  # dist/
+cd frontend && npm run build # frontend/dist/
 ```
-
-Output will be in `frontend/dist/`
-
-### Project Structure
 
 ```
 photos-to-folders/
 ├── setup.sh
 ├── start-server.sh
+├── test-images/               # default inbox
+├── docs/                      # README demo video
 ├── backend/
-│   ├── server.js              # Express server entry point
+│   ├── server.ts
 │   ├── routes/
-│   │   ├── images.js          # Image endpoints
-│   │   └── folders.js         # Folder management endpoints
-│   ├── services/
-│   │   └── fileService.js     # File system operations
-│   ├── package.json
+│   │   ├── images.ts
+│   │   └── folders.ts
+│   ├── services/fileService.ts
 │   ├── .env.example
-│   └── .gitignore
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx            # Main app component
-│   │   ├── App.css            # Main styles
-│   │   ├── main.jsx           # React entry point
-│   │   ├── components/
-│   │   │   ├── ImageViewer.jsx
-│   │   │   ├── FolderList.jsx
-│   │   │   └── CreateFolderModal.jsx
-│   │   └── services/
-│   │       └── api.js         # API client
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── package.json
-│   └── .gitignore
-└── README.md
+│   └── package.json
+└── frontend/
+    ├── src/
+    │   ├── App.tsx
+    │   ├── main.tsx
+    │   ├── components/
+    │   ├── hooks/
+    │   └── services/
+    ├── vite.config.js
+    └── package.json
 ```
 
 ## Troubleshooting
 
-### Images Not Loading
-- Ensure `IMAGE_DIRECTORY` in `.env` points to a valid directory with images
-- Check that the backend is running on port 5000
-- Verify the backend and frontend are both running
+**Images not loading** — `IMAGE_DIRECTORY` in `backend/.env` must exist (default `../test-images` at the repo root) and contain supported files at the root. Both servers must be running.
 
-### "No images to display"
-- Check the `IMAGE_DIRECTORY` path exists and contains supported image formats (JPG, PNG, GIF, WebP)
-- Ensure your user has read permissions on the directory
+**Nothing here yet** — only root-level JPG/PNG/GIF/WebP are shown. Files already in subfolders are ignored.
 
-### Port Already in Use
-- Backend (port 5000): Change `PORT` in `.env`
-- Frontend (port 3000): Vite will automatically use the next available port
+**Port in use** — change `PORT` in `.env` for the backend. Vite picks the next free port if 3000 is taken. `start-server.sh` kills whatever is already on 5000.
 
 ## License
 

@@ -9,7 +9,7 @@ npm install
 
 if [[ ! -f .env ]]; then
   cp .env.example .env
-  echo "Created backend/.env from .env.example — edit IMAGE_DIRECTORY before starting."
+  echo "Created backend/.env from .env.example (inbox: $ROOT/test-images)."
 else
   echo "backend/.env already exists, skipping copy."
 fi
