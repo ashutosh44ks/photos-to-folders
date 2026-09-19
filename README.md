@@ -4,7 +4,7 @@ A local web app to sort images from a single inbox folder into destination folde
 
 ## Demo
 
-<video src="docs/brag.mp4" poster="docs/brag.jpg" controls playsinline width="100%"></video>
+https://github.com/user-attachments/assets/70188fc4-a666-42fe-bea7-f9442b343fc6
 
 ## Features
 
