@@ -147,3 +147,41 @@ body {
 @theme {
   --text-2xs: 0.625rem;
 }
+
+@keyframes hint-spotlight-in {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hint-arrow-in {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.hint-spotlight {
+  animation: hint-spotlight-in 1.8s ease-in-out forwards;
+}
+
+.hint-arrow {
+  animation: hint-arrow-in 1.8s ease-in-out forwards;
+}

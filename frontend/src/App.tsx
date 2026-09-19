@@ -10,6 +10,7 @@ import { Kbd } from './components/ui/kbd'
 import { useHotkeys } from './hooks/useHotkeys'
 import { useIgnoredFolders } from './hooks/useIgnoredFolders'
 import { useLayoutSettings } from './hooks/useLayoutSettings'
+import { useSettingsHint } from './hooks/useSettingsHint'
 
 export default function App() {
   const { data: images = [], displayedImages, setDisplayedImages, isLoading } = useImages()
@@ -19,6 +20,7 @@ export default function App() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedFolders, setSelectedFolders] = useState<string[]>([])
   const [showManagementModal, setShowManagementModal] = useState(false)
+  const { active: showSettingsHint, key: hintKey, trigger: handleEmptyFoldersHint } = useSettingsHint()
   const [ignoredFolders, setIgnoredFolders] = useIgnoredFolders()
   const { settings, updateLayout, toggleShowImagesLeft, toggleShowPreviewImages } = useLayoutSettings()
   const visibleFolders = folders.filter((f) => !ignoredFolders.includes(f))
@@ -115,6 +117,46 @@ export default function App() {
         />
       </div>
 
+      {showSettingsHint && (
+        <>
+          <div
+            key={`spotlight-${hintKey}`}
+            aria-hidden
+            className="hint-spotlight pointer-events-none absolute inset-0 z-15"
+            style={{
+              background:
+                'radial-gradient(circle 56px at 40px 40px, transparent 0%, transparent 55%, rgb(0 0 0 / 0.35) 100%)',
+            }}
+          />
+          <svg
+            key={`arrow-${hintKey}`}
+            aria-hidden
+            className="hint-arrow pointer-events-none absolute inset-0 z-25 h-full w-full"
+          >
+            <defs>
+              <marker
+                id="hint-arrowhead"
+                markerWidth="8"
+                markerHeight="8"
+                refX="6"
+                refY="4"
+                orient="auto"
+              >
+                <path d="M0,0 L8,4 L0,8 Z" fill="rgb(28 25 23 / 0.85)" />
+              </marker>
+            </defs>
+            <path
+              d="M 150 420 C 90 280, 55 140, 48 56"
+              fill="none"
+              stroke="rgb(28 25 23 / 0.75)"
+              strokeWidth="2"
+              strokeDasharray="6 5"
+              markerEnd="url(#hint-arrowhead)"
+            />
+          </svg>
+        </>
+      )}
+
       <div className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
         <Button
           onClick={() => setShowManagementModal(true)}
@@ -136,7 +178,7 @@ export default function App() {
           className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
           title="Previous image (←)"
         >
-            <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </Button>
         <Button
           onClick={handleNext}
@@ -146,7 +188,7 @@ export default function App() {
           className="rounded-full border-white/70 bg-white/80 shadow-lg shadow-stone-900/10 backdrop-blur-md hover:bg-white"
           title="Next image (→)"
         >
-            <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
@@ -160,6 +202,7 @@ export default function App() {
             layout={settings.folderListLayout}
             imagesLeft={displayedImages.length}
             showImagesLeft={settings.showImagesLeft}
+            onEmptyStateClick={handleEmptyFoldersHint}
           />
 
           <Button
@@ -172,7 +215,7 @@ export default function App() {
             className="mt-4 w-full"
           >
             {moveImageMutation.isPending ? 'Saving...' : 'Save & Next'}
-            <Kbd size='sm' className='text-stone-500'>
+            <Kbd size="sm" className="text-stone-500">
               ⏎
             </Kbd>
           </Button>
@@ -241,7 +284,6 @@ export default function App() {
           onShowPreviewImagesChange={toggleShowPreviewImages}
         />
       )}
-
     </div>
   )
 }

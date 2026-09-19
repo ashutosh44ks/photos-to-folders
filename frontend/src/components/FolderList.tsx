@@ -11,6 +11,7 @@ type FolderListProps = {
   layout?: FolderListLayout
   imagesLeft?: number
   showImagesLeft?: boolean
+  onEmptyStateClick?: () => void
 }
 
 const FolderList: FC<FolderListProps> = ({
@@ -21,6 +22,7 @@ const FolderList: FC<FolderListProps> = ({
   layout = 'list',
   imagesLeft,
   showImagesLeft = false,
+  onEmptyStateClick,
 }) => {
   const displayTotalCount = totalCount ?? folders.length
 
@@ -38,9 +40,13 @@ const FolderList: FC<FolderListProps> = ({
       </div>
 
       {folders.length === 0 && displayTotalCount === 0 ? (
-        <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50 px-2 py-3 text-center">
+        <button
+          type="button"
+          onClick={onEmptyStateClick}
+          className="w-full rounded-2xl border border-dashed border-stone-200 bg-stone-50 px-2 py-3 text-center transition hover:border-stone-300 hover:bg-stone-100"
+        >
           <p className="text-sm text-stone-500">No folders yet. Create one to get started.</p>
-        </div>
+        </button>
       ) : folders.length === 0 && displayTotalCount > 0 ? (
         <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50 px-2 py-3 text-center">
           <p className="text-sm text-stone-500">All folders are hidden. Unhide some in folder management.</p>
